@@ -1,0 +1,336 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 48;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		AE1E071D205BD029000448BB /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = AE1E071C205BD029000448BB /* AppDelegate.m */; };
+		AE1E0720205BD029000448BB /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AE1E071F205BD029000448BB /* ViewController.m */; };
+		AE1E0723205BD029000448BB /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AE1E0721205BD029000448BB /* Main.storyboard */; };
+		AE1E0725205BD029000448BB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AE1E0724205BD029000448BB /* Assets.xcassets */; };
+		AE1E0728205BD029000448BB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AE1E0726205BD029000448BB /* LaunchScreen.storyboard */; };
+		AE1E072B205BD029000448BB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = AE1E072A205BD029000448BB /* main.m */; };
+		AE1E0733205BD04F000448BB /* RunsNetSpeedMeasurer.m in Sources */ = {isa = PBXBuildFile; fileRef = AE1E0732205BD04F000448BB /* RunsNetSpeedMeasurer.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		AE1E0718205BD029000448BB /* RunsNetSpeedMeasurer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RunsNetSpeedMeasurer.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AE1E071B205BD029000448BB /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		AE1E071C205BD029000448BB /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		AE1E071E205BD029000448BB /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		AE1E071F205BD029000448BB /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		AE1E0722205BD029000448BB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		AE1E0724205BD029000448BB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		AE1E0727205BD029000448BB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		AE1E0729205BD029000448BB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AE1E072A205BD029000448BB /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		AE1E0731205BD04F000448BB /* RunsNetSpeedMeasurer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RunsNetSpeedMeasurer.h; sourceTree = "<group>"; };
+		AE1E0732205BD04F000448BB /* RunsNetSpeedMeasurer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RunsNetSpeedMeasurer.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		AE1E0715205BD029000448BB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		AE1E070F205BD029000448BB = {
+			isa = PBXGroup;
+			children = (
+				AE1E071A205BD029000448BB /* RunsNetSpeedMeasurer */,
+				AE1E0719205BD029000448BB /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		AE1E0719205BD029000448BB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				AE1E0718205BD029000448BB /* RunsNetSpeedMeasurer.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		AE1E071A205BD029000448BB /* RunsNetSpeedMeasurer */ = {
+			isa = PBXGroup;
+			children = (
+				AE1E071B205BD029000448BB /* AppDelegate.h */,
+				AE1E071C205BD029000448BB /* AppDelegate.m */,
+				AE1E071E205BD029000448BB /* ViewController.h */,
+				AE1E071F205BD029000448BB /* ViewController.m */,
+				AE1E0731205BD04F000448BB /* RunsNetSpeedMeasurer.h */,
+				AE1E0732205BD04F000448BB /* RunsNetSpeedMeasurer.m */,
+				AE1E0721205BD029000448BB /* Main.storyboard */,
+				AE1E0724205BD029000448BB /* Assets.xcassets */,
+				AE1E0726205BD029000448BB /* LaunchScreen.storyboard */,
+				AE1E0729205BD029000448BB /* Info.plist */,
+				AE1E072A205BD029000448BB /* main.m */,
+			);
+			path = RunsNetSpeedMeasurer;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		AE1E0717205BD029000448BB /* RunsNetSpeedMeasurer */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AE1E072E205BD029000448BB /* Build configuration list for PBXNativeTarget "RunsNetSpeedMeasurer" */;
+			buildPhases = (
+				AE1E0714205BD029000448BB /* Sources */,
+				AE1E0715205BD029000448BB /* Frameworks */,
+				AE1E0716205BD029000448BB /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = RunsNetSpeedMeasurer;
+			productName = RunsNetworkSpeedMeasurer;
+			productReference = AE1E0718205BD029000448BB /* RunsNetSpeedMeasurer.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		AE1E0710205BD029000448BB /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				CLASSPREFIX = Runs;
+				LastUpgradeCheck = 0920;
+				ORGANIZATIONNAME = Olacio;
+				TargetAttributes = {
+					AE1E0717205BD029000448BB = {
+						CreatedOnToolsVersion = 9.2;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = AE1E0713205BD029000448BB /* Build configuration list for PBXProject "RunsNetSpeedMeasurer" */;
+			compatibilityVersion = "Xcode 8.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = AE1E070F205BD029000448BB;
+			productRefGroup = AE1E0719205BD029000448BB /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				AE1E0717205BD029000448BB /* RunsNetSpeedMeasurer */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		AE1E0716205BD029000448BB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AE1E0728205BD029000448BB /* LaunchScreen.storyboard in Resources */,
+				AE1E0725205BD029000448BB /* Assets.xcassets in Resources */,
+				AE1E0723205BD029000448BB /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		AE1E0714205BD029000448BB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AE1E0733205BD04F000448BB /* RunsNetSpeedMeasurer.m in Sources */,
+				AE1E0720205BD029000448BB /* ViewController.m in Sources */,
+				AE1E072B205BD029000448BB /* main.m in Sources */,
+				AE1E071D205BD029000448BB /* AppDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		AE1E0721205BD029000448BB /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				AE1E0722205BD029000448BB /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		AE1E0726205BD029000448BB /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				AE1E0727205BD029000448BB /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		AE1E072C205BD029000448BB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		AE1E072D205BD029000448BB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		AE1E072F205BD029000448BB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 8ZW2NN4PTY;
+				INFOPLIST_FILE = "$(SRCROOT)/RunsNetSpeedMeasurer/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.olacio.com.RunsNetworkSpeedMeasurer;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		AE1E0730205BD029000448BB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 8ZW2NN4PTY;
+				INFOPLIST_FILE = "$(SRCROOT)/RunsNetSpeedMeasurer/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.olacio.com.RunsNetworkSpeedMeasurer;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		AE1E0713205BD029000448BB /* Build configuration list for PBXProject "RunsNetSpeedMeasurer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AE1E072C205BD029000448BB /* Debug */,
+				AE1E072D205BD029000448BB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AE1E072E205BD029000448BB /* Build configuration list for PBXNativeTarget "RunsNetSpeedMeasurer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AE1E072F205BD029000448BB /* Debug */,
+				AE1E0730205BD029000448BB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = AE1E0710205BD029000448BB /* Project object */;
+}
