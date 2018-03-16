@@ -12,6 +12,15 @@
 
 #import "RunsNetSpeedMeasurer.h"
 
+NSString * const RunsNetworkMaxDownloadSpeedAttributeName       = @"RunsNetworkMaxDownloadSpeedAttributeName";
+NSString * const RunsNetworkAverageDownloadSpeedAttributeName   = @"RunsNetworkAverageDownloadSpeedAttributeName";
+NSString * const RunsNetworkCurrentDownloadSpeedAttributeName   = @"RunsNetworkCurrentDownloadSpeedAttributeName";
+NSString * const RunsNetworkMaxUploadSpeedAttributeName         = @"RunsNetworkMaxUploadSpeedAttributeName";
+NSString * const RunsNetworkAverageUploadSpeedAttributeName     = @"RunsNetworkAverageUploadSpeedAttributeName";
+NSString * const RunsNetworkCurrentUploadSpeedAttributeName     = @"RunsNetworkCurrentUploadSpeedAttributeName";
+extern NSString * const RunsNetworkConnectionTypeAttributeName  = @"RunsNetworkConnectionTypeAttributeName";
+
+
 
 @implementation RunsNetFragmentation
 @end

@@ -25,9 +25,12 @@ typedef NS_ENUM(NSUInteger, RunsNetConnectionType) {
 
 NS_ASSUME_NONNULL_BEGIN
 
-extern NSString * const RunsNetworkMaxSpeedAttributeName;
-extern NSString * const RunsNetworkAverageSpeedAttributeName;
-extern NSString * const RunsNetworkCurrentSpeedAttributeName;
+extern NSString * const RunsNetworkMaxDownloadSpeedAttributeName;
+extern NSString * const RunsNetworkAverageDownloadSpeedAttributeName;
+extern NSString * const RunsNetworkCurrentDownloadSpeedAttributeName;
+extern NSString * const RunsNetworkMaxUploadSpeedAttributeName;
+extern NSString * const RunsNetworkAverageUploadSpeedAttributeName;
+extern NSString * const RunsNetworkCurrentUploadSpeedAttributeName;
 extern NSString * const RunsNetworkConnectionTypeAttributeName;
 
 typedef void(^RunsNetworkSpeedAttributeCallback)(NSDictionary<NSString *, id> *attributes);
