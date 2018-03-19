@@ -44,14 +44,14 @@ NSString * const RunsNetworkConnectionTypeAttributeName         = @"RunsNetworkC
 @end
 
 @interface RunsNetSpeedMeasurer()
-@property (nonatomic, assign) NSTimeInterval measurerInterval;
 @property (nonatomic, assign) RunsNetMeasurerCapability measurerCapability;
-@property (nonatomic, strong) RunsNetworkSpeedAttributeCallback measurerBlock;
 @property (nonatomic, strong) id<ISpeedMeasurerProtocol> uplinkSpeedMeasurer;
 @property (nonatomic, strong) id<ISpeedMeasurerProtocol> downlinkSpeedMeasurer;
 @end
 
 @implementation RunsNetSpeedMeasurer
+@synthesize measurerBlock;
+@synthesize measurerInterval;
 @synthesize accuracyLevel;
 @synthesize delegate;
 
@@ -97,7 +97,6 @@ NSString * const RunsNetworkConnectionTypeAttributeName         = @"RunsNetworkC
 }
 
 - (void)disableCapability:(RunsNetMeasurerCapability)capability {
-    
     if (RunsNetMeasurer_AllCapability == capability) {
         _downlinkSpeedMeasurer = nil;
         _uplinkSpeedMeasurer = nil;
@@ -111,11 +110,31 @@ NSString * const RunsNetworkConnectionTypeAttributeName         = @"RunsNetworkC
     return [_downlinkSpeedMeasurer hasCapability:capability] || [_uplinkSpeedMeasurer hasCapability:capability];
 }
 
-- (void)mesaurerByInterval:(NSTimeInterval)interval attributesBlock:(RunsNetworkSpeedAttributeCallback)block {
-    _measurerInterval = interval <= 0.f ? 1.f : interval;
-    _measurerBlock = block;
+- (void)setMeasurerInterval:(NSTimeInterval)measurerInterval_ {
+    measurerInterval = measurerInterval_ <= 0.f ? 1.f : measurerInterval_;
+    _downlinkSpeedMeasurer.measurerInterval = measurerInterval;
+    _uplinkSpeedMeasurer.measurerInterval = measurerInterval;
+}
+
+- (void)setMeasurerBlock:(RunsNetworkSpeedAttributeCallback)measurerBlock_ {
+    measurerBlock = measurerBlock_;
+    [self subcribe];
+}
+
+- (void)setDelegate:(id<RunsNetSpeedMeasurerDelegate>)delegate_ {
+    delegate = delegate_;
+    [self subcribe];
+}
+
+- (void)mesaurerByInterval:(NSTimeInterval)interval attributesDelegate:(id<RunsNetSpeedMeasurerDelegate>)delegate {
+    self.measurerInterval = interval <= 0.f ? 1.f : interval;
+    self.delegate = delegate;
+    [self subcribe];
+}
+
+- (void)subcribe {
     __weak typeof(self) weak_self = self;
-    [_downlinkSpeedMeasurer mesaurerByInterval:_measurerInterval attributesBlock:^(NSDictionary<NSString *,id> * _Nonnull attributes) {
+    [_downlinkSpeedMeasurer setMeasurerBlock:^(NSDictionary<NSString *,NSNumber *> * _Nonnull attributes) {
         if (attributes.count <= 0) return ;
         if (weak_self.measurerBlock) {
             weak_self.measurerBlock(attributes);
@@ -125,7 +144,7 @@ NSString * const RunsNetworkConnectionTypeAttributeName         = @"RunsNetworkC
             [weak_self.delegate measurer:weak_self didCompletedByInterval:attributes];
         }
     }];
-    [_uplinkSpeedMeasurer mesaurerByInterval:_measurerInterval attributesBlock:^(NSDictionary<NSString *,id> * _Nonnull attributes) {
+    [_uplinkSpeedMeasurer setMeasurerBlock:^(NSDictionary<NSString *,NSNumber *> * _Nonnull attributes) {
         if (attributes.count <= 0) return ;
         if (weak_self.measurerBlock) {
             weak_self.measurerBlock(attributes);
@@ -137,12 +156,22 @@ NSString * const RunsNetworkConnectionTypeAttributeName         = @"RunsNetworkC
     }];
 }
 
-- (void)setAccuracyLevel:(NSUInteger)accuracyLevel {
+- (void)setAccuracyLevel:(NSUInteger)accuracyLevel_ {
     NSUInteger max = MEASURER_ACCURACY_LEVEL_MAX;
     NSUInteger min = MEASURER_ACCURACY_LEVEL_MIN;
-    self.accuracyLevel = accuracyLevel >= min ? accuracyLevel <= max ?: max : min;
+    accuracyLevel = accuracyLevel_ >= min ? accuracyLevel_ <= max ?: max : min;
     _downlinkSpeedMeasurer.accuracyLevel = self.accuracyLevel;
     _uplinkSpeedMeasurer.accuracyLevel = self.accuracyLevel;
+}
+
+- (void)execute {
+    [_downlinkSpeedMeasurer execute];
+    [_uplinkSpeedMeasurer execute];
+}
+
+- (void)shutdown {
+    [_downlinkSpeedMeasurer shutdown];
+    [_uplinkSpeedMeasurer shutdown];
 }
 
 - (id<ISpeedMeasurerProtocol>)uplinkSpeedMeasurer {
@@ -156,32 +185,20 @@ NSString * const RunsNetworkConnectionTypeAttributeName         = @"RunsNetworkC
     _downlinkSpeedMeasurer = [[RunsNetDownlinkSpeedMeasurer alloc] initWithAccuracyLevel:self.accuracyLevel];;
     return _downlinkSpeedMeasurer;
 }
-
-- (void)execute {
-    [_downlinkSpeedMeasurer execute];
-    [_uplinkSpeedMeasurer execute];
-}
-
-- (void)shutdown {
-    [_downlinkSpeedMeasurer shutdown];
-    [_uplinkSpeedMeasurer shutdown];
-}
-
 @end
 
 
 @interface RunsNetSubSpeedMeasurer()
 @property (nonatomic, strong) NSTimer *dispatchTimer;
-@property (nonatomic, assign) NSTimeInterval measurerInterval;
 @property (nonatomic, assign) RunsNetMeasurerCapability measurerCapability;
-@property (nonatomic, strong) RunsNetworkSpeedAttributeCallback measurerBlock;
 @property (nonatomic, strong) NSMutableArray<RunsNetFragmentation *> *fragmentArray;
 @property (nonatomic) u_int32_t previousInputBytesCount;
 @property (nonatomic) u_int32_t previousOutputBytesCount;
 @end
 
 @implementation RunsNetSubSpeedMeasurer
-
+@synthesize measurerBlock;
+@synthesize measurerInterval;
 @synthesize accuracyLevel;
 @synthesize delegate;
 
@@ -213,17 +230,6 @@ NSString * const RunsNetworkConnectionTypeAttributeName         = @"RunsNetworkC
 
 - (BOOL)hasCapability:(RunsNetMeasurerCapability)capability {
     return _measurerCapability & capability;
-}
-
-- (void)mesaurerByInterval:(NSTimeInterval)interval attributesBlock:(RunsNetworkSpeedAttributeCallback)block {
-    _measurerInterval = interval <= 0.f ? 1.f : interval;
-    _measurerBlock = block;
-}
-
-- (void)setAccuracyLevel:(NSUInteger)accuracyLevel {
-    NSUInteger max = MEASURER_ACCURACY_LEVEL_MAX;
-    NSUInteger min = MEASURER_ACCURACY_LEVEL_MIN;
-    self.accuracyLevel = accuracyLevel >= min ? accuracyLevel <= max ?: max : min;
 }
 
 - (void)execute {
@@ -275,7 +281,7 @@ NSString * const RunsNetworkConnectionTypeAttributeName         = @"RunsNetworkC
 - (RunsNetFragmentation *)wrapFragmentWithConntype:(RunsNetConnectionType)type inputBytes:(u_int32_t)ibytes outputBytes:(u_int32_t)obytes {
     RunsNetFragmentation *fragment = [[RunsNetFragmentation alloc] init];
     fragment.endTimestamp = [[NSDate date] timeIntervalSince1970];
-    fragment.beginTimestamp = fragment.endTimestamp - _measurerInterval;
+    fragment.beginTimestamp = fragment.endTimestamp - self.measurerInterval;
     fragment.inputBytesCount = ibytes - _previousInputBytesCount;
     fragment.outputBytesCount = obytes - _previousOutputBytesCount;
     fragment.connectionType = type;
@@ -297,20 +303,21 @@ NSString * const RunsNetworkConnectionTypeAttributeName         = @"RunsNetworkC
 }
 
 - (double)calculateSpeedWithKeyPath:(NSString *)keyPath {
-    double bytesInMegabyte = 1024 * 1024;
+    double bytesInMegabyte = 1024 * 1024 * 1000;
     double maxPerMeasureInterval = [[self.fragmentArray valueForKeyPath:keyPath] doubleValue] / bytesInMegabyte;
     return maxPerMeasureInterval / self.measurerInterval;
 }
 
 - (double)calculateRealTimeSpeedWithKeyPath:(NSString *)keyPath {
-    if ([[NSDate date] timeIntervalSinceNow] - _fragmentArray.lastObject.endTimestamp > _measurerInterval)
+    if ([[NSDate date] timeIntervalSinceNow] - _fragmentArray.lastObject.endTimestamp > self.measurerInterval) {
         return 0;
+    }
     uint32_t bytesCount = _fragmentArray.lastObject.inputBytesCount;
     if ([keyPath isEqualToString:RunsNetFragmentation.realTimeOutputKeyPath]) {
         bytesCount = _fragmentArray.lastObject.outputBytesCount;
     }
-    double bytesPerSecondInBytes = bytesCount / _measurerInterval;
-    double bytesInMegabyte = 1024 * 1024;
+    double bytesPerSecondInBytes = bytesCount / self.measurerInterval;
+    double bytesInMegabyte = 1024 * 1024 * 1000;
     return bytesPerSecondInBytes / bytesInMegabyte;
 }
 
@@ -322,8 +329,10 @@ NSString * const RunsNetworkConnectionTypeAttributeName         = @"RunsNetworkC
 }
 
 - (int)maxFramentArrayCapacity {
-    return (1 / _measurerInterval) * accuracyLevel * 600;
+    return (1 / self.measurerInterval) * accuracyLevel * 600;
 }
+
+
 @end
 
 @implementation RunsNetUplinkSpeedMeasurer
@@ -331,14 +340,6 @@ NSString * const RunsNetworkConnectionTypeAttributeName         = @"RunsNetworkC
 #ifdef DEBUG
     NSLog(@"RunsNetUplinkSpeedMeasurer Release");
 #endif
-}
-
-- (instancetype)initWithAccuracyLevel:(NSUInteger)accuracyLevel {
-    self = [super initWithAccuracyLevel:accuracyLevel];
-    if (self) {
-        
-    }
-    return self;
 }
 
 - (void)dispatch {
@@ -376,14 +377,6 @@ NSString * const RunsNetworkConnectionTypeAttributeName         = @"RunsNetworkC
 #ifdef DEBUG
     NSLog(@"RunsNetDownlinkSpeedMeasurer Release");
 #endif
-}
-
-- (instancetype)initWithAccuracyLevel:(NSUInteger)accuracyLevel {
-    self = [super initWithAccuracyLevel:accuracyLevel];
-    if (self) {
-        
-    }
-    return self;
 }
 
 - (void)dispatch {

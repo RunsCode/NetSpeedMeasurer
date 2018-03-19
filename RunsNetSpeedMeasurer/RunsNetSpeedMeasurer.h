@@ -66,9 +66,10 @@ typedef void(^RunsNetworkSpeedAttributeCallback)(NSDictionary<NSString *, NSNumb
 
 @protocol ISpeedMeasurerProtocol <NSObject>
 @property (nonatomic, assign) NSUInteger accuracyLevel;//精度等级 1~5
+@property (nonatomic, assign) NSTimeInterval measurerInterval;
 @property (nonatomic, weak) id<RunsNetSpeedMeasurerDelegate> delegate;//Block和Delegate 二选一, Block优先级更高.
+@property (nonatomic, strong) RunsNetworkSpeedAttributeCallback measurerBlock;//Block和Delegate 二选一, Block优先级更高.
 - (instancetype)initWithAccuracyLevel:(NSUInteger)accuracyLevel;
-- (void)mesaurerByInterval:(NSTimeInterval)interval attributesBlock:(RunsNetworkSpeedAttributeCallback)block;
 - (void)enableCapability:(RunsNetMeasurerCapability)capability;
 - (void)disableCapability:(RunsNetMeasurerCapability)capability;
 - (BOOL)hasCapability:(RunsNetMeasurerCapability)capability;
