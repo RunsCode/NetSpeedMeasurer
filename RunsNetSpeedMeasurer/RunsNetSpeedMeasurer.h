@@ -18,10 +18,32 @@ typedef unsigned long long RULong;
 #endif
 
 typedef NS_ENUM(NSUInteger, RunsNetConnectionType) {
-    RunsNetConnectionType_WiFi,
-    RunsNetConnectionType_WWAN,
+    RunsNetConnectionType_WiFi = 0,
+    RunsNetConnectionType_WWAN = 1,
 };
 
+typedef NS_ENUM(NSUInteger, RunsNetMeasurerCapability) {
+    RunsNetMeasurer_MaxDownloadSpeed        = 1 << 0,
+    RunsNetMeasurer_MinDownloadSpeed        = 1 << 1,
+    RunsNetMeasurer_AverageDownloadSpeed    = 1 << 2,
+    RunsNetMeasurer_RealTimeDownloadSpeed   = 1 << 3,
+    RunsNetMeasurer_AllDownloadSpeed        = RunsNetMeasurer_MaxDownloadSpeed
+                                            | RunsNetMeasurer_MinDownloadSpeed
+                                            | RunsNetMeasurer_AverageDownloadSpeed
+                                            | RunsNetMeasurer_RealTimeDownloadSpeed,
+    //
+    RunsNetMeasurer_MaxUploadSpeed          = 1 << 4,
+    RunsNetMeasurer_MinUploadSpeed          = 1 << 5,
+    RunsNetMeasurer_AverageUPloadSpeed      = 1 << 6,
+    RunsNetMeasurer_RealTimeUploadSpeed     = 1 << 7,
+    RunsNetMeasurer_AllUploadSpeed          = RunsNetMeasurer_MaxUploadSpeed
+                                            | RunsNetMeasurer_MinUploadSpeed
+                                            | RunsNetMeasurer_AverageUPloadSpeed
+                                            | RunsNetMeasurer_RealTimeUploadSpeed,
+    //
+    RunsNetMeasurer_AllCapability           = RunsNetMeasurer_AllDownloadSpeed | RunsNetMeasurer_AllUploadSpeed,
+    RunsNetMeasurer_Default                 = RunsNetMeasurer_AllCapability
+};
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -37,14 +59,18 @@ typedef void(^RunsNetworkSpeedAttributeCallback)(NSDictionary<NSString *, id> *a
 
 @protocol ISpeedMeasurerProtocol;
 @protocol RunsNetSpeedMeasurerDelegate <NSObject>
-- (NSTimeInterval)intervalForMeasurer:(id<ISpeedMeasurerProtocol>)measurer;
+//- (NSTimeInterval)intervalForMeasurer:(id<ISpeedMeasurerProtocol>)measurer;
 - (void)measurer:(id<ISpeedMeasurerProtocol>)measurer didCompletedByInterval:(NSDictionary<NSString *, id>*)attributes;
 @end
 
 @protocol ISpeedMeasurerProtocol <NSObject>
 @property (nonatomic, assign) NSUInteger accuracyLevel;//精度等级 1~5
-@property (nonatomic, weak) id<RunsNetSpeedMeasurerDelegate> delegate;
+@property (nonatomic, weak) id<RunsNetSpeedMeasurerDelegate> delegate;//Block和Delegate 二选一, Block优先级更高.
+- (instancetype)initWithAccuracyLevel:(NSUInteger)accuracyLevel;
 - (void)mesaurerByInterval:(NSTimeInterval)interval attributesBlock:(RunsNetworkSpeedAttributeCallback)block;
+- (void)enableCapability:(RunsNetMeasurerCapability)capability;
+- (void)disableCapability:(RunsNetMeasurerCapability)capability;
+- (BOOL)hasCapability:(RunsNetMeasurerCapability)capability;
 @end
 
 @interface RunsNetFragmentation : NSObject
@@ -59,5 +85,22 @@ typedef void(^RunsNetworkSpeedAttributeCallback)(NSDictionary<NSString *, id> *a
 @interface RunsNetSpeedMeasurer : NSObject <ISpeedMeasurerProtocol>
 
 @end
+
+@interface RunsNetSubSpeedMeasurer : NSObject <ISpeedMeasurerProtocol>
+@property (nonatomic) RULong previousWifiBytesCount;
+@property (nonatomic) RULong previousWwanBytesCount;
+@property (nonatomic) RULong previousWifiPacketsCount;
+@property (nonatomic) RULong previousWwanPacketsCount;
+@end
+
+@interface RunsNetUplinkSpeedMeasurer : RunsNetSubSpeedMeasurer
+
+@end
+
+@interface RunsNetDownlinkSpeedMeasurer : RunsNetSubSpeedMeasurer
+
+@end
+
+
 
 NS_ASSUME_NONNULL_END
