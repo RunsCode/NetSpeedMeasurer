@@ -64,13 +64,6 @@ typedef void(^RunsNetworkSpeedAttributeCallback)(NSDictionary<NSString *, NSNumb
 - (void)measurer:(id<ISpeedMeasurerProtocol>)measurer didCompletedByInterval:(NSDictionary<NSString *, id>*)attributes;
 @end
 
-@protocol ISubSpeedMeasurerProtocol <NSObject>
-- (double)calculateMaxSpeed;
-- (double)calculateMinSpeed;
-- (double)calculateAverageSpeed;
-- (double)calculateRealTimeSpeed;
-@end
-
 @protocol ISpeedMeasurerProtocol <NSObject>
 @property (nonatomic, assign) NSUInteger accuracyLevel;//精度等级 1~5
 @property (nonatomic, weak) id<RunsNetSpeedMeasurerDelegate> delegate;//Block和Delegate 二选一, Block优先级更高.
@@ -87,17 +80,23 @@ typedef void(^RunsNetworkSpeedAttributeCallback)(NSDictionary<NSString *, NSNumb
 @property (nonatomic, assign) RunsNetConnectionType connectionType;
 @property (nonatomic, assign) u_int32_t inputBytesCount;
 @property (nonatomic, assign) u_int32_t outputBytesCount;
+@property (nonatomic) NSTimeInterval beginTimestamp;
+@property (nonatomic) NSTimeInterval endTimestamp;
++ (NSString *)maxValueInputKeyPath;
++ (NSString *)minValueInputKeyPath;
++ (NSString *)avgValueInputKeyPath;
++ (NSString *)maxValueOutputKeyPath;
++ (NSString *)minValueOutputKeyPath;
++ (NSString *)avgValueOutputKeyPath;
++ (NSString *)realTimeInputKeyPath;
++ (NSString *)realTimeOutputKeyPath;
 @end
 
 @interface RunsNetSpeedMeasurer : NSObject <ISpeedMeasurerProtocol>
 
 @end
 
-@interface RunsNetSubSpeedMeasurer : NSObject <ISpeedMeasurerProtocol, ISubSpeedMeasurerProtocol>
-@property (nonatomic) u_int32_t previousWifiInputBytesCount;
-@property (nonatomic) u_int32_t previousWwanInputBytesCount;
-@property (nonatomic) u_int32_t previousWifiOutputBytesCount;
-@property (nonatomic) u_int32_t previousWwanOutputBytesCount;
+@interface RunsNetSubSpeedMeasurer : NSObject <ISpeedMeasurerProtocol>
 - (void)dispatch;
 @end
 
