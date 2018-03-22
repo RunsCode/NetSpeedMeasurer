@@ -41,7 +41,7 @@
 
 If you believe you have identified a security vulnerability with NetSpeedMeasurer, you should report it as soon as possible via email to runs.wang.dev@gmail.com. Please do not post it to a public issue tracker.
 
-#####License
+##### License
 
 NetSpeedMeasurer is released under the MIT license. See LICENSE for details.
 
