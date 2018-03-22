@@ -29,11 +29,16 @@
 + (NSString *)avgValueOutputKeyPath { return @"@avg.outputBytesCount"; }
 + (NSString *)realTimeInputKeyPath { return  @"real.time.input"; }
 + (NSString *)realTimeOutputKeyPath { return  @"real.time.output"; }
+
+- (NSString *)description {
+    return [NSString stringWithFormat:@"connectionType : %lu, inputBytesCount : %u, outputBytesCount : %u, beginTimestamp : %f, endTimestamp : %f",(unsigned long)_connectionType, _inputBytesCount, _outputBytesCount, _beginTimestamp, _endTimestamp];
+}
 @end
 
 @implementation RunsNetMeasurerResult
+
 - (NSString *)description {
-    return [NSString stringWithFormat:@"\nUplink: \n{\n   max : %.2f MB/s, min : %.2f MB/s, avg : %.2f MB/s, cur : %.2f MB/s \n}, \nDownlink: \n{\n   max : %.2f MB/s, min : %.2f MB/s, avg : %.2f MB/s, cur : %.2f MB/s \n}",
+    return [NSString stringWithFormat:@"\nUplink: \n{\n   max : %.2f MB/s, min : %.2f MB/s, avg : %.2f MB/s, cur : %.2f MB/s \n}, \nDownlink: \n{\n   max : %.2f MB/s, min : %.2f MB/s, avg : %.2f MB/s, cur : %.2f MB/s \n}\n",
             _uplinkMaxSpeed, _uplinkMinSpeed, _uplinkAvgSpeed, _uplinkCurSpeed, _downlinkMaxSpeed, _downlinkMinSpeed, _downlinkAvgSpeed, _downlinkCurSpeed];
 }
 @end
@@ -46,10 +51,10 @@
 @end
 
 @implementation RunsNetSpeedMeasurer
-@synthesize measurerBlock;
-@synthesize measurerInterval;
-@synthesize accuracyLevel;
-@synthesize delegate;
+@synthesize measurerBlock = _measurerBlock;
+@synthesize measurerInterval = _measurerInterval;
+@synthesize accuracyLevel = _accuracyLevel;
+@synthesize delegate = _delegate;
 
 - (void)dealloc {
 #ifdef DEBUG
@@ -59,34 +64,35 @@
 
 #pragma mark -- Public Method ISpeedMeasurerProtocol
 
-- (instancetype)initWithAccuracyLevel:(NSUInteger)accuracyLevel {
+- (instancetype)initWithAccuracyLevel:(NSUInteger)accuracyLevel interval:(NSTimeInterval)interval {
     self = [super init];
     if (self) {
         self.accuracyLevel = accuracyLevel;
+        self.measurerInterval = interval;
     }
     return self;
 }
 
-- (void)setMeasurerInterval:(NSTimeInterval)measurerInterval_ {
-    measurerInterval = measurerInterval_ <= 0.f ? 1.f : measurerInterval_;
+- (void)setMeasurerInterval:(NSTimeInterval)measurerInterval {
+    _measurerInterval = measurerInterval <= 0.f ? 1.f : measurerInterval;
 }
 
-- (void)setMeasurerBlock:(RunsNetworkSpeedAttributeCallback)measurerBlock_ {
-    measurerBlock = measurerBlock_;
-}
-
-- (void)setDelegate:(id<RunsNetSpeedMeasurerDelegate>)delegate_ {
-    delegate = delegate_;
- }
-
-- (void)setAccuracyLevel:(NSUInteger)accuracyLevel_ {
+- (void)setAccuracyLevel:(NSUInteger)accuracyLevel {
     NSUInteger max = MEASURER_ACCURACY_LEVEL_MAX;
     NSUInteger min = MEASURER_ACCURACY_LEVEL_MIN;
-    accuracyLevel = accuracyLevel_ >= min ? accuracyLevel_ <= max ?: max : min;
+    _accuracyLevel = accuracyLevel >= min ? accuracyLevel <= max ?: max : min;
+}
+
+- (void)initPreviousValue {
+    RunsNetFragmentation *fragment = [self currentNetCardTrafficData];
+    if(!fragment) return;
+    _previousInputBytesCount = fragment.inputBytesCount;
+    _previousOutputBytesCount = fragment.outputBytesCount;
 }
 
 - (void)execute {
     if (_dispatchTimer) return;
+    [self initPreviousValue];
     _dispatchTimer = [NSTimer scheduledTimerWithTimeInterval:self.measurerInterval target:self selector:@selector(dispatch) userInfo:nil repeats:YES];
     NSRunLoop *runLoop = [NSRunLoop currentRunLoop];
     [runLoop addTimer:_dispatchTimer forMode:NSRunLoopCommonModes];
@@ -96,6 +102,12 @@
     if (!_dispatchTimer) return;
     [_dispatchTimer invalidate];
     _dispatchTimer = nil;
+    //
+    _previousInputBytesCount = 0;
+    _previousOutputBytesCount = 0;
+    //
+    
+    [_fragmentArray removeAllObjects];
 }
 
 - (RunsNetFragmentation * _Nullable )currentNetCardTrafficData {
@@ -139,7 +151,7 @@
     fragment.outputBytesCount = obytes - _previousOutputBytesCount;
     fragment.connectionType = type;
     //
-    _previousOutputBytesCount = ibytes;
+    _previousInputBytesCount = ibytes;
     _previousOutputBytesCount = obytes;
     //
     return fragment;
@@ -171,18 +183,18 @@
         result.downlinkCurSpeed = [self calculateRealTimeSpeedWithKeyPath:RunsNetFragmentation.realTimeInputKeyPath];
     }
     
-    if (measurerBlock) {
-        measurerBlock(result);
+    if (_measurerBlock) {
+        _measurerBlock(result);
         return;
     }
     
-    if (delegate && [delegate respondsToSelector:@selector(measurer:didCompletedByInterval:)]) {
-        [delegate measurer:self didCompletedByInterval:result];
+    if (_delegate && [_delegate respondsToSelector:@selector(measurer:didCompletedByInterval:)]) {
+        [_delegate measurer:self didCompletedByInterval:result];
     }
 }
 
 - (double)calculateSpeedWithKeyPath:(NSString *)keyPath {
-    double bytesInMegabyte = 1024 * 1024 * 1000;
+    double bytesInMegabyte = 1024 * 1024;
     double maxPerMeasureInterval = [[self.fragmentArray valueForKeyPath:keyPath] doubleValue] / bytesInMegabyte;
     return maxPerMeasureInterval / self.measurerInterval;
 }
@@ -196,7 +208,7 @@
         bytesCount = _fragmentArray.lastObject.outputBytesCount;
     }
     double bytesPerSecondInBytes = bytesCount / self.measurerInterval;
-    double bytesInMegabyte = 1024 * 1024 * 1000;
+    double bytesInMegabyte = 1024 * 1024;
     return bytesPerSecondInBytes / bytesInMegabyte;
 }
 
@@ -208,7 +220,7 @@
 }
 
 - (int)maxFramentArrayCapacity {
-    return (1 / self.measurerInterval) * accuracyLevel * 600;
+    return (1 / _measurerInterval) * _accuracyLevel * 600;
 }
 
 @end
