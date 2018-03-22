@@ -59,7 +59,7 @@
     [_measurer execute];
     NSLog(@"onDowmloadTest");
     //
-    NSURL* url = [NSURL URLWithString:@"http://record.olacio.com/record/data/media/2-28155/merge-audio_20180314122538352.m4a"];
+    NSURL* url = [NSURL URLWithString:@"Download url"];
     if (!url)  return;
     
     NSURLSessionConfiguration* config = [NSURLSessionConfiguration defaultSessionConfiguration];
