@@ -106,7 +106,6 @@
     _previousInputBytesCount = 0;
     _previousOutputBytesCount = 0;
     //
-    
     [_fragmentArray removeAllObjects];
 }
 
@@ -118,7 +117,7 @@
     
     u_int32_t ibytes = 0;
     u_int32_t obytes = 0;
-    //统计显卡上下行流量
+    //统计网卡上下行流量
     for (ifa = ifa_list; ifa; ifa = ifa->ifa_next) {
         if (AF_LINK != ifa->ifa_addr->sa_family) continue;
         if (!(ifa->ifa_flags & IFF_UP) && !(ifa->ifa_flags & IFF_RUNNING))  continue;
