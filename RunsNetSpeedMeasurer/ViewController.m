@@ -30,19 +30,19 @@
     // 1.
     _measurer.delegate = self;
     //2.
-//    __weak typeof(self) weak_self = self;
-//    _measurer.measurerBlock = ^(RunsNetMeasurerResult * _Nonnull result) {
-//        RunsNetConnectionType netType = result.connectionType;
-//        weak_self.netTypeLabel.text = netType == RunsNetConnectionType_WiFi ?  @"WWAN-移动数据网络" :  @"WiFi-无线网络";
-//        weak_self.uploadMaxSpeedLabel.text = [NSString stringWithFormat:@"Max : %.2f MB/s",result.uplinkMaxSpeed];
-//        weak_self.uploadMinSpeedLabel.text = [NSString stringWithFormat:@"Min : %.2f MB/s",result.uplinkMinSpeed];
-//        weak_self.uploadAvgSpeedLabel.text = [NSString stringWithFormat:@"Avg : %.2f MB/s",result.uplinkAvgSpeed];
-//        weak_self.uploadCurSpeedLabel.text = [NSString stringWithFormat:@"Cur : %.2f MB/s",result.uplinkCurSpeed];
-//        weak_self.downloadMaxSpeedLabel.text = [NSString stringWithFormat:@"Max : %.2f MB/s",result.downlinkMaxSpeed];
-//        weak_self.downloadMinSpeedLabel.text = [NSString stringWithFormat:@"Min : %.2f MB/s",result.downlinkMinSpeed];
-//        weak_self.downloadAvgSpeedLabel.text = [NSString stringWithFormat:@"Avg : %.2f MB/s",result.downlinkAvgSpeed];
-//        weak_self.downloadCurSpeedLabel.text = [NSString stringWithFormat:@"Cur : %.2f MB/s",result.downlinkCurSpeed];
-//    };
+    __weak typeof(self) weak_self = self;
+    _measurer.measurerBlock = ^(RunsNetMeasurerResult * _Nonnull result) {
+        RunsNetConnectionType netType = result.connectionType;
+        weak_self.netTypeLabel.text = netType == RunsNetConnectionType_WiFi ?  @"WWAN-移动数据网络" :  @"WiFi-无线网络";
+        weak_self.uploadMaxSpeedLabel.text = [NSString stringWithFormat:@"Max : %.2f MB/s",result.uplinkMaxSpeed];
+        weak_self.uploadMinSpeedLabel.text = [NSString stringWithFormat:@"Min : %.2f MB/s",result.uplinkMinSpeed];
+        weak_self.uploadAvgSpeedLabel.text = [NSString stringWithFormat:@"Avg : %.2f MB/s",result.uplinkAvgSpeed];
+        weak_self.uploadCurSpeedLabel.text = [NSString stringWithFormat:@"Cur : %.2f MB/s",result.uplinkCurSpeed];
+        weak_self.downloadMaxSpeedLabel.text = [NSString stringWithFormat:@"Max : %.2f MB/s",result.downlinkMaxSpeed];
+        weak_self.downloadMinSpeedLabel.text = [NSString stringWithFormat:@"Min : %.2f MB/s",result.downlinkMinSpeed];
+        weak_self.downloadAvgSpeedLabel.text = [NSString stringWithFormat:@"Avg : %.2f MB/s",result.downlinkAvgSpeed];
+        weak_self.downloadCurSpeedLabel.text = [NSString stringWithFormat:@"Cur : %.2f MB/s",result.downlinkCurSpeed];
+    };
 }
 
 
