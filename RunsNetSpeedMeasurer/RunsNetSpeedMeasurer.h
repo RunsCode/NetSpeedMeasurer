@@ -22,46 +22,13 @@ typedef NS_ENUM(NSUInteger, RunsNetConnectionType) {
     RunsNetConnectionType_WWAN = 1,
 };
 
-typedef NS_ENUM(NSUInteger, RunsNetMeasurerCapability) {
-    RunsNetMeasurer_MaxDownloadSpeed        = 1 << 0,
-    RunsNetMeasurer_MinDownloadSpeed        = 1 << 1,
-    RunsNetMeasurer_AverageDownloadSpeed    = 1 << 2,
-    RunsNetMeasurer_RealTimeDownloadSpeed   = 1 << 3,
-    RunsNetMeasurer_AllDownloadSpeed        = RunsNetMeasurer_MaxDownloadSpeed
-                                            | RunsNetMeasurer_MinDownloadSpeed
-                                            | RunsNetMeasurer_AverageDownloadSpeed
-                                            | RunsNetMeasurer_RealTimeDownloadSpeed,
-    //
-    RunsNetMeasurer_MaxUploadSpeed          = 1 << 4,
-    RunsNetMeasurer_MinUploadSpeed          = 1 << 5,
-    RunsNetMeasurer_AverageUploadSpeed      = 1 << 6,
-    RunsNetMeasurer_RealTimeUploadSpeed     = 1 << 7,
-    RunsNetMeasurer_AllUploadSpeed          = RunsNetMeasurer_MaxUploadSpeed
-                                            | RunsNetMeasurer_MinUploadSpeed
-                                            | RunsNetMeasurer_AverageUploadSpeed
-                                            | RunsNetMeasurer_RealTimeUploadSpeed,
-    //
-    RunsNetMeasurer_AllCapability           = RunsNetMeasurer_AllDownloadSpeed | RunsNetMeasurer_AllUploadSpeed,
-    RunsNetMeasurer_Default                 = RunsNetMeasurer_AllCapability
-};
-
 NS_ASSUME_NONNULL_BEGIN
-
-extern NSString * const RunsNetworkMaxDownloadSpeedAttributeName;
-extern NSString * const RunsNetworkMinDownloadSpeedAttributeName;
-extern NSString * const RunsNetworkAverageDownloadSpeedAttributeName;
-extern NSString * const RunsNetworkCurrentDownloadSpeedAttributeName;
-extern NSString * const RunsNetworkMaxUploadSpeedAttributeName;
-extern NSString * const RunsNetworkMinUploadSpeedAttributeName;
-extern NSString * const RunsNetworkAverageUploadSpeedAttributeName;
-extern NSString * const RunsNetworkCurrentUploadSpeedAttributeName;
-extern NSString * const RunsNetworkConnectionTypeAttributeName;
-
-typedef void(^RunsNetworkSpeedAttributeCallback)(NSDictionary<NSString *, NSNumber *> *attributes);
+@class RunsNetMeasurerResult;
+typedef void(^RunsNetworkSpeedAttributeCallback)(RunsNetMeasurerResult *result);
 
 @protocol ISpeedMeasurerProtocol;
 @protocol RunsNetSpeedMeasurerDelegate <NSObject>
-- (void)measurer:(id<ISpeedMeasurerProtocol>)measurer didCompletedByInterval:(NSDictionary<NSString *, id>*)attributes;
+- (void)measurer:(id<ISpeedMeasurerProtocol>)measurer didCompletedByInterval:(RunsNetMeasurerResult *)result;
 @end
 
 @protocol ISpeedMeasurerProtocol <NSObject>
@@ -70,9 +37,6 @@ typedef void(^RunsNetworkSpeedAttributeCallback)(NSDictionary<NSString *, NSNumb
 @property (nonatomic, weak) id<RunsNetSpeedMeasurerDelegate> delegate;//Block和Delegate 二选一, Block优先级更高.
 @property (nonatomic, strong) RunsNetworkSpeedAttributeCallback measurerBlock;//Block和Delegate 二选一, Block优先级更高.
 - (instancetype)initWithAccuracyLevel:(NSUInteger)accuracyLevel;
-- (void)enableCapability:(RunsNetMeasurerCapability)capability;
-- (void)disableCapability:(RunsNetMeasurerCapability)capability;
-- (BOOL)hasCapability:(RunsNetMeasurerCapability)capability;
 - (void)execute;
 - (void)shutdown;
 @end
@@ -93,19 +57,19 @@ typedef void(^RunsNetworkSpeedAttributeCallback)(NSDictionary<NSString *, NSNumb
 + (NSString *)realTimeOutputKeyPath;
 @end
 
+@interface RunsNetMeasurerResult : NSObject
+@property (nonatomic, assign) RunsNetConnectionType connectionType;
+@property (nonatomic, assign) double uplinkMaxSpeed;
+@property (nonatomic, assign) double uplinkMinSpeed;
+@property (nonatomic, assign) double uplinkAvgSpeed;
+@property (nonatomic, assign) double uplinkCurSpeed;
+@property (nonatomic, assign) double downlinkMaxSpeed;
+@property (nonatomic, assign) double downlinkMinSpeed;
+@property (nonatomic, assign) double downlinkAvgSpeed;
+@property (nonatomic, assign) double downlinkCurSpeed;
+@end
+
 @interface RunsNetSpeedMeasurer : NSObject <ISpeedMeasurerProtocol>
-
-@end
-
-@interface RunsNetSubSpeedMeasurer : NSObject <ISpeedMeasurerProtocol>
-- (void)dispatch;
-@end
-
-@interface RunsNetUplinkSpeedMeasurer : RunsNetSubSpeedMeasurer
-
-@end
-
-@interface RunsNetDownlinkSpeedMeasurer : RunsNetSubSpeedMeasurer
 
 @end
 

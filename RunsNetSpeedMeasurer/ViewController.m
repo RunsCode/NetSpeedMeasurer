@@ -27,7 +27,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     _measurer = [[RunsNetSpeedMeasurer alloc] initWithAccuracyLevel:5];
-    [_measurer enableCapability:RunsNetMeasurer_Default];
+//    [_measurer enableCapability:RunsNetMeasurer_Default];
     _measurer.delegate = self;
     _measurer.measurerInterval = 0.5f;
 }
@@ -64,44 +64,44 @@
 
 - (void)URLSession:(NSURLSession*)session downloadTask:(NSURLSessionDownloadTask*)downloadTask didWriteData:(int64_t)bytesWritten totalBytesWritten:(int64_t)totalBytesWritten totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
 {
-    float progress = (float)totalBytesWritten / totalBytesExpectedToWrite;
-        NSLog(@"下载进度 ：%f", progress);
+//    float progress = (float)totalBytesWritten / totalBytesExpectedToWrite;
+//    NSLog(@"下载进度 ：%f", progress);
 }
 
 #pragma mark -- RunsNetSpeedMeasurerDelegate
-
-- (void)measurer:(nonnull id<ISpeedMeasurerProtocol>)measurer didCompletedByInterval:(nonnull NSDictionary<NSString *,id> *)attributes {
-    [self displayNetAttributes:attributes];
+- (void)measurer:(id<ISpeedMeasurerProtocol>)measurer didCompletedByInterval:(RunsNetMeasurerResult *)result {
+    [self displayNetAttributes:result];
 }
 
-- (void)displayNetAttributes:(NSDictionary *)attributes {
-    RunsNetConnectionType netType = [attributes[RunsNetworkConnectionTypeAttributeName] integerValue];
+- (void)displayNetAttributes:(RunsNetMeasurerResult *)result {
+    RunsNetConnectionType netType = result.connectionType;
     _netTypeLabel.text = netType == RunsNetConnectionType_WiFi ?  @"WWAN-移动数据网络" :  @"WiFi-无线网络";
-    CGFloat uploadMaxSpeed = [attributes[RunsNetworkMaxUploadSpeedAttributeName] doubleValue];
-    _uploadMaxSpeedLabel.text = [NSString stringWithFormat:@"Max : %.2f MB/s",uploadMaxSpeed];
-    CGFloat uploadMinSpeed = [attributes[RunsNetworkMinUploadSpeedAttributeName] doubleValue];
-    _uploadMinSpeedLabel.text = [NSString stringWithFormat:@"Min : %.2f MB/s",uploadMinSpeed];
-    CGFloat uploadAvgSpeed = [attributes[RunsNetworkAverageUploadSpeedAttributeName] doubleValue];
-    _uploadAvgSpeedLabel.text = [NSString stringWithFormat:@"Avg : %.2f MB/s",uploadAvgSpeed];
-    CGFloat uploadCurSpeed = [attributes[RunsNetworkCurrentUploadSpeedAttributeName] doubleValue];
-    _uploadCurSpeedLabel.text = [NSString stringWithFormat:@"Cur : %.2f MB/s",uploadCurSpeed];
+    _uploadMaxSpeedLabel.text = [NSString stringWithFormat:@"Max : %.2f MB/s",result.uplinkMaxSpeed];
+    _uploadMinSpeedLabel.text = [NSString stringWithFormat:@"Min : %.2f MB/s",result.uplinkMinSpeed];
+    _uploadAvgSpeedLabel.text = [NSString stringWithFormat:@"Avg : %.2f MB/s",result.uplinkAvgSpeed];
+    _uploadCurSpeedLabel.text = [NSString stringWithFormat:@"Cur : %.2f MB/s",result.uplinkCurSpeed];
+    _downloadMaxSpeedLabel.text = [NSString stringWithFormat:@"Max : %.2f MB/s",result.downlinkMaxSpeed];
+    _downloadMinSpeedLabel.text = [NSString stringWithFormat:@"Min : %.2f MB/s",result.downlinkMinSpeed];
+    _downloadAvgSpeedLabel.text = [NSString stringWithFormat:@"Avg : %.2f MB/s",result.downlinkAvgSpeed];
+    _downloadCurSpeedLabel.text = [NSString stringWithFormat:@"Cur : %.2f MB/s",result.downlinkCurSpeed];
     //
-    CGFloat downMaxSpeed = [attributes[RunsNetworkMaxDownloadSpeedAttributeName] doubleValue];
-    NSLog(@"downMaxSpeed = %.2f", downMaxSpeed);
-    if (downMaxSpeed > 0)
-        _downloadMaxSpeedLabel.text = [NSString stringWithFormat:@"Max : %.2f MB/s",downMaxSpeed];
-    CGFloat downloadMinSpeed = [attributes[RunsNetworkMinDownloadSpeedAttributeName] doubleValue];
-    NSLog(@"downloadMinSpeed = %.2f", downloadMinSpeed);
-    if (downloadMinSpeed > 0)
-        _downloadMinSpeedLabel.text = [NSString stringWithFormat:@"Min : %.2f MB/s",downloadMinSpeed];
-    CGFloat downloadAvgSpeed = [attributes[RunsNetworkAverageDownloadSpeedAttributeName] doubleValue];
-    NSLog(@"downloadAvgSpeed = %.2f", downloadAvgSpeed);
-    if (downloadAvgSpeed > 0)
-        _downloadAvgSpeedLabel.text = [NSString stringWithFormat:@"Avg : %.2f MB/s",downloadAvgSpeed];
-    CGFloat downloadCurSpeed = [attributes[RunsNetworkCurrentDownloadSpeedAttributeName] doubleValue];
-    NSLog(@"downloadCurSpeed = %.2f", downloadCurSpeed);
-    if (downloadCurSpeed > 0)
-        _downloadCurSpeedLabel.text = [NSString stringWithFormat:@"Cur : %.2f MB/s",downloadCurSpeed];
+    NSLog(@"%@", result);
+//    CGFloat downMaxSpeed = [attributes[RunsNetworkMaxDownloadSpeedAttributeName] doubleValue];
+//    NSLog(@"downMaxSpeed = %.2f", downMaxSpeed);
+//    if (downMaxSpeed > 0)
+//        _downloadMaxSpeedLabel.text = [NSString stringWithFormat:@"Max : %.2f MB/s",downMaxSpeed];
+//    CGFloat downloadMinSpeed = [attributes[RunsNetworkMinDownloadSpeedAttributeName] doubleValue];
+//    NSLog(@"downloadMinSpeed = %.2f", downloadMinSpeed);
+//    if (downloadMinSpeed > 0)
+//        _downloadMinSpeedLabel.text = [NSString stringWithFormat:@"Min : %.2f MB/s",downloadMinSpeed];
+//    CGFloat downloadAvgSpeed = [attributes[RunsNetworkAverageDownloadSpeedAttributeName] doubleValue];
+//    NSLog(@"downloadAvgSpeed = %.2f", downloadAvgSpeed);
+//    if (downloadAvgSpeed > 0)
+//        _downloadAvgSpeedLabel.text = [NSString stringWithFormat:@"Avg : %.2f MB/s",downloadAvgSpeed];
+//    CGFloat downloadCurSpeed = [attributes[RunsNetworkCurrentDownloadSpeedAttributeName] doubleValue];
+//    NSLog(@"downloadCurSpeed = %.2f", downloadCurSpeed);
+//    if (downloadCurSpeed > 0)
+//        _downloadCurSpeedLabel.text = [NSString stringWithFormat:@"Cur : %.2f MB/s",downloadCurSpeed];
 }
 
 

@@ -13,7 +13,6 @@
 #define WIFI_PREFIX  @"en"
 #define WWAN_PREFIX  @"pdp_ip"
 
-
 #include <arpa/inet.h>
 #include <ifaddrs.h>
 #include <net/if.h>
@@ -21,32 +20,29 @@
 
 #import "RunsNetSpeedMeasurer.h"
 
-NSString * const RunsNetworkMaxDownloadSpeedAttributeName       = @"RunsNetworkMaxDownloadSpeedAttributeName";
-NSString * const RunsNetworkMinDownloadSpeedAttributeName       = @"RunsNetworkMinDownloadSpeedAttributeName";
-NSString * const RunsNetworkAverageDownloadSpeedAttributeName   = @"RunsNetworkAverageDownloadSpeedAttributeName";
-NSString * const RunsNetworkCurrentDownloadSpeedAttributeName   = @"RunsNetworkCurrentDownloadSpeedAttributeName";
-NSString * const RunsNetworkMaxUploadSpeedAttributeName         = @"RunsNetworkMaxUploadSpeedAttributeName";
-NSString * const RunsNetworkMinUploadSpeedAttributeName         = @"RunsNetworkMinUploadSpeedAttributeName";
-NSString * const RunsNetworkAverageUploadSpeedAttributeName     = @"RunsNetworkAverageUploadSpeedAttributeName";
-NSString * const RunsNetworkCurrentUploadSpeedAttributeName     = @"RunsNetworkCurrentUploadSpeedAttributeName";
-NSString * const RunsNetworkConnectionTypeAttributeName         = @"RunsNetworkConnectionTypeAttributeName";
-
-
 @implementation RunsNetFragmentation
-+ (NSString *)maxValueInputKeyPath { return @"@max.inputBytesCount";}
-+ (NSString *)minValueInputKeyPath { return @"@min.inputBytesCount";}
-+ (NSString *)avgValueInputKeyPath { return @"@avg.inputBytesCount";}
-+ (NSString *)maxValueOutputKeyPath { return @"@max.outputBytesCount";}
-+ (NSString *)minValueOutputKeyPath { return @"@min.outputBytesCount";}
-+ (NSString *)avgValueOutputKeyPath { return @"@avg.outputBytesCount";}
-+ (NSString *)realTimeInputKeyPath {return  @"real.time.input";}
-+ (NSString *)realTimeOutputKeyPath {return  @"real.time.output";}
++ (NSString *)maxValueInputKeyPath { return @"@max.inputBytesCount"; }
++ (NSString *)minValueInputKeyPath { return @"@min.inputBytesCount"; }
++ (NSString *)avgValueInputKeyPath { return @"@avg.inputBytesCount"; }
++ (NSString *)maxValueOutputKeyPath { return @"@max.outputBytesCount"; }
++ (NSString *)minValueOutputKeyPath { return @"@min.outputBytesCount"; }
++ (NSString *)avgValueOutputKeyPath { return @"@avg.outputBytesCount"; }
++ (NSString *)realTimeInputKeyPath { return  @"real.time.input"; }
++ (NSString *)realTimeOutputKeyPath { return  @"real.time.output"; }
+@end
+
+@implementation RunsNetMeasurerResult
+- (NSString *)description {
+    return [NSString stringWithFormat:@"\nUplink: \n{\n   max : %.2f MB/s, min : %.2f MB/s, avg : %.2f MB/s, cur : %.2f MB/s \n}, \nDownlink: \n{\n   max : %.2f MB/s, min : %.2f MB/s, avg : %.2f MB/s, cur : %.2f MB/s \n}",
+            _uplinkMaxSpeed, _uplinkMinSpeed, _uplinkAvgSpeed, _uplinkCurSpeed, _downlinkMaxSpeed, _downlinkMinSpeed, _downlinkAvgSpeed, _downlinkCurSpeed];
+}
 @end
 
 @interface RunsNetSpeedMeasurer()
-@property (nonatomic, assign) RunsNetMeasurerCapability measurerCapability;
-@property (nonatomic, strong) id<ISpeedMeasurerProtocol> uplinkSpeedMeasurer;
-@property (nonatomic, strong) id<ISpeedMeasurerProtocol> downlinkSpeedMeasurer;
+@property (nonatomic, strong) NSTimer *dispatchTimer;
+@property (nonatomic, strong) NSMutableArray<RunsNetFragmentation *> *fragmentArray;
+@property (nonatomic) u_int32_t previousInputBytesCount;
+@property (nonatomic) u_int32_t previousOutputBytesCount;
 @end
 
 @implementation RunsNetSpeedMeasurer
@@ -61,14 +57,6 @@ NSString * const RunsNetworkConnectionTypeAttributeName         = @"RunsNetworkC
 #endif
 }
 
-- (instancetype)init {
-    self = [super init];
-    if (self) {
-        //
-    }
-    return self;
-}
-
 #pragma mark -- Public Method ISpeedMeasurerProtocol
 
 - (instancetype)initWithAccuracyLevel:(NSUInteger)accuracyLevel {
@@ -79,157 +67,22 @@ NSString * const RunsNetworkConnectionTypeAttributeName         = @"RunsNetworkC
     return self;
 }
 
-- (void)enableCapability:(RunsNetMeasurerCapability)capability {
-    //通过能力区分避免意外初始化不必要的能力对象
-    if (RunsNetMeasurer_AllCapability == capability) {
-        [self.downlinkSpeedMeasurer enableCapability:RunsNetMeasurer_AllDownloadSpeed];
-        [self.uplinkSpeedMeasurer enableCapability:RunsNetMeasurer_AllUploadSpeed];
-        return;
-    }
-    
-    if (RunsNetMeasurer_AllDownloadSpeed & capability) {
-        [self.downlinkSpeedMeasurer enableCapability:capability];
-        return;
-    }
-    if (RunsNetMeasurer_AllUploadSpeed & capability) {
-        [self.uplinkSpeedMeasurer enableCapability:capability];
-    }
-}
-
-- (void)disableCapability:(RunsNetMeasurerCapability)capability {
-    if (RunsNetMeasurer_AllCapability == capability) {
-        _downlinkSpeedMeasurer = nil;
-        _uplinkSpeedMeasurer = nil;
-        return;
-    }
-    [_downlinkSpeedMeasurer disableCapability:capability];
-    [_uplinkSpeedMeasurer disableCapability:capability];
-}
-
-- (BOOL)hasCapability:(RunsNetMeasurerCapability)capability {
-    return [_downlinkSpeedMeasurer hasCapability:capability] || [_uplinkSpeedMeasurer hasCapability:capability];
-}
-
 - (void)setMeasurerInterval:(NSTimeInterval)measurerInterval_ {
     measurerInterval = measurerInterval_ <= 0.f ? 1.f : measurerInterval_;
-    _downlinkSpeedMeasurer.measurerInterval = measurerInterval;
-    _uplinkSpeedMeasurer.measurerInterval = measurerInterval;
 }
 
 - (void)setMeasurerBlock:(RunsNetworkSpeedAttributeCallback)measurerBlock_ {
     measurerBlock = measurerBlock_;
-    [self subcribe];
 }
 
 - (void)setDelegate:(id<RunsNetSpeedMeasurerDelegate>)delegate_ {
     delegate = delegate_;
-    [self subcribe];
-}
-
-- (void)mesaurerByInterval:(NSTimeInterval)interval attributesDelegate:(id<RunsNetSpeedMeasurerDelegate>)delegate {
-    self.measurerInterval = interval <= 0.f ? 1.f : interval;
-    self.delegate = delegate;
-    [self subcribe];
-}
-
-- (void)subcribe {
-    __weak typeof(self) weak_self = self;
-    [_downlinkSpeedMeasurer setMeasurerBlock:^(NSDictionary<NSString *,NSNumber *> * _Nonnull attributes) {
-        if (attributes.count <= 0) return ;
-        if (weak_self.measurerBlock) {
-            weak_self.measurerBlock(attributes);
-            return;
-        }
-        if (weak_self.delegate && [weak_self.delegate respondsToSelector:@selector(measurer:didCompletedByInterval:)]) {
-            [weak_self.delegate measurer:weak_self didCompletedByInterval:attributes];
-        }
-    }];
-    [_uplinkSpeedMeasurer setMeasurerBlock:^(NSDictionary<NSString *,NSNumber *> * _Nonnull attributes) {
-        if (attributes.count <= 0) return ;
-        if (weak_self.measurerBlock) {
-            weak_self.measurerBlock(attributes);
-            return;
-        }
-        if (weak_self.delegate && [weak_self.delegate respondsToSelector:@selector(measurer:didCompletedByInterval:)]) {
-            [weak_self.delegate measurer:weak_self didCompletedByInterval:attributes];
-        }
-    }];
-}
+ }
 
 - (void)setAccuracyLevel:(NSUInteger)accuracyLevel_ {
     NSUInteger max = MEASURER_ACCURACY_LEVEL_MAX;
     NSUInteger min = MEASURER_ACCURACY_LEVEL_MIN;
     accuracyLevel = accuracyLevel_ >= min ? accuracyLevel_ <= max ?: max : min;
-    _downlinkSpeedMeasurer.accuracyLevel = self.accuracyLevel;
-    _uplinkSpeedMeasurer.accuracyLevel = self.accuracyLevel;
-}
-
-- (void)execute {
-    [_downlinkSpeedMeasurer execute];
-    [_uplinkSpeedMeasurer execute];
-}
-
-- (void)shutdown {
-    [_downlinkSpeedMeasurer shutdown];
-    [_uplinkSpeedMeasurer shutdown];
-}
-
-- (id<ISpeedMeasurerProtocol>)uplinkSpeedMeasurer {
-    if (_uplinkSpeedMeasurer) return _uplinkSpeedMeasurer;
-    _uplinkSpeedMeasurer = [[RunsNetUplinkSpeedMeasurer alloc] initWithAccuracyLevel:self.accuracyLevel];;
-    return _uplinkSpeedMeasurer;
-}
-
-- (id<ISpeedMeasurerProtocol>)downlinkSpeedMeasurer {
-    if (_downlinkSpeedMeasurer) return _downlinkSpeedMeasurer;
-    _downlinkSpeedMeasurer = [[RunsNetDownlinkSpeedMeasurer alloc] initWithAccuracyLevel:self.accuracyLevel];;
-    return _downlinkSpeedMeasurer;
-}
-@end
-
-
-@interface RunsNetSubSpeedMeasurer()
-@property (nonatomic, strong) NSTimer *dispatchTimer;
-@property (nonatomic, assign) RunsNetMeasurerCapability measurerCapability;
-@property (nonatomic, strong) NSMutableArray<RunsNetFragmentation *> *fragmentArray;
-@property (nonatomic) u_int32_t previousInputBytesCount;
-@property (nonatomic) u_int32_t previousOutputBytesCount;
-@end
-
-@implementation RunsNetSubSpeedMeasurer
-@synthesize measurerBlock;
-@synthesize measurerInterval;
-@synthesize accuracyLevel;
-@synthesize delegate;
-
-- (void)dealloc {
-#ifdef DEBUG
-    NSLog(@"RunsNetSubSpeedMeasurer Release");
-#endif
-}
-
-#pragma mark -- Public Method ISpeedMeasurerProtocol
-
-- (instancetype)initWithAccuracyLevel:(NSUInteger)accuracyLevel {
-    self = [super init];
-    if (self) {
-        self.accuracyLevel = accuracyLevel;
-    }
-    return self;
-}
-
-- (void)enableCapability:(RunsNetMeasurerCapability)capability {
-    _measurerCapability |= capability;
-}
-
-- (void)disableCapability:(RunsNetMeasurerCapability)capability {
-    if (_measurerCapability & capability) {
-        capability &= ~capability;
-    }
-}
-
-- (BOOL)hasCapability:(RunsNetMeasurerCapability)capability {
-    return _measurerCapability & capability;
 }
 
 - (void)execute {
@@ -250,7 +103,7 @@ NSString * const RunsNetworkConnectionTypeAttributeName         = @"RunsNetworkC
     if (getifaddrs(&ifa_list) == -1) {
         return nil;
     }
-
+    
     u_int32_t ibytes = 0;
     u_int32_t obytes = 0;
     //统计显卡上下行流量
@@ -299,7 +152,33 @@ NSString * const RunsNetworkConnectionTypeAttributeName         = @"RunsNetworkC
         [_fragmentArray removeObjectAtIndex:0];
     }
     [self.fragmentArray addObject:fragment];
-    //sub class will override
+    [self calculateSpeed];
+}
+
+- (void)calculateSpeed {
+    RunsNetMeasurerResult *result = [[RunsNetMeasurerResult alloc] init];
+    result.connectionType = self.fragmentArray.lastObject.connectionType;
+    {//上行
+        result.uplinkMaxSpeed = [self calculateSpeedWithKeyPath:RunsNetFragmentation.maxValueOutputKeyPath];
+        result.uplinkMinSpeed = [self calculateSpeedWithKeyPath:RunsNetFragmentation.minValueOutputKeyPath];
+        result.uplinkAvgSpeed = [self calculateSpeedWithKeyPath:RunsNetFragmentation.avgValueOutputKeyPath];
+        result.uplinkCurSpeed = [self calculateRealTimeSpeedWithKeyPath:RunsNetFragmentation.realTimeOutputKeyPath];
+    }
+    {//下行
+        result.downlinkMaxSpeed = [self calculateSpeedWithKeyPath:RunsNetFragmentation.maxValueInputKeyPath];
+        result.downlinkMinSpeed = [self calculateSpeedWithKeyPath:RunsNetFragmentation.minValueInputKeyPath];
+        result.downlinkAvgSpeed = [self calculateSpeedWithKeyPath:RunsNetFragmentation.avgValueInputKeyPath];
+        result.downlinkCurSpeed = [self calculateRealTimeSpeedWithKeyPath:RunsNetFragmentation.realTimeInputKeyPath];
+    }
+    
+    if (measurerBlock) {
+        measurerBlock(result);
+        return;
+    }
+    
+    if (delegate && [delegate respondsToSelector:@selector(measurer:didCompletedByInterval:)]) {
+        [delegate measurer:self didCompletedByInterval:result];
+    }
 }
 
 - (double)calculateSpeedWithKeyPath:(NSString *)keyPath {
@@ -309,7 +188,7 @@ NSString * const RunsNetworkConnectionTypeAttributeName         = @"RunsNetworkC
 }
 
 - (double)calculateRealTimeSpeedWithKeyPath:(NSString *)keyPath {
-    if ([[NSDate date] timeIntervalSinceNow] - _fragmentArray.lastObject.endTimestamp > self.measurerInterval) {
+    if (NSDate.date.timeIntervalSinceNow - _fragmentArray.lastObject.endTimestamp > self.measurerInterval) {
         return 0;
     }
     uint32_t bytesCount = _fragmentArray.lastObject.inputBytesCount;
@@ -332,79 +211,4 @@ NSString * const RunsNetworkConnectionTypeAttributeName         = @"RunsNetworkC
     return (1 / self.measurerInterval) * accuracyLevel * 600;
 }
 
-
 @end
-
-@implementation RunsNetUplinkSpeedMeasurer
-- (void)dealloc {
-#ifdef DEBUG
-    NSLog(@"RunsNetUplinkSpeedMeasurer Release");
-#endif
-}
-
-- (void)dispatch {
-    [super dispatch];
-    if (self.fragmentArray.count <= 0)  return;
-
-    NSMutableDictionary *attributes = [[NSMutableDictionary alloc] initWithCapacity:5];
-    [attributes setObject:@(self.fragmentArray.lastObject.connectionType) forKey:RunsNetworkConnectionTypeAttributeName];
-    if ([self hasCapability:RunsNetMeasurer_MaxUploadSpeed]) {
-        double max = [self calculateSpeedWithKeyPath:RunsNetFragmentation.maxValueOutputKeyPath];
-        [attributes setObject:@(max) forKey:RunsNetworkMaxUploadSpeedAttributeName];
-    }
-    if ([self hasCapability:RunsNetMeasurer_MinUploadSpeed]) {
-        double min = [self calculateSpeedWithKeyPath:RunsNetFragmentation.minValueOutputKeyPath];
-        [attributes setObject:@(min) forKey:RunsNetworkMinUploadSpeedAttributeName];
-    }
-    if ([self hasCapability:RunsNetMeasurer_AverageUploadSpeed]) {
-        double avg = [self calculateSpeedWithKeyPath:RunsNetFragmentation.avgValueOutputKeyPath];
-        [attributes setObject:@(avg) forKey:RunsNetworkAverageUploadSpeedAttributeName];
-    }
-    if ([self hasCapability:RunsNetMeasurer_RealTimeUploadSpeed]) {
-        double cur = [self calculateRealTimeSpeedWithKeyPath:RunsNetFragmentation.realTimeOutputKeyPath];
-        [attributes setObject:@(cur) forKey:RunsNetworkCurrentUploadSpeedAttributeName];
-    }
-    if (self.measurerBlock) {
-        self.measurerBlock(attributes);
-    }
-}
-
-@end
-
-@implementation RunsNetDownlinkSpeedMeasurer
-
-- (void)dealloc {
-#ifdef DEBUG
-    NSLog(@"RunsNetDownlinkSpeedMeasurer Release");
-#endif
-}
-
-- (void)dispatch {
-    [super dispatch];
-    if (self.fragmentArray.count <= 0)  return;
-    NSMutableDictionary *attributes = [[NSMutableDictionary alloc] initWithCapacity:5];
-    [attributes setObject:@(self.fragmentArray.lastObject.connectionType) forKey:RunsNetworkConnectionTypeAttributeName];
-    if ([self hasCapability:RunsNetMeasurer_MaxDownloadSpeed])  {
-        double max = [self calculateSpeedWithKeyPath:RunsNetFragmentation.maxValueInputKeyPath];
-        [attributes setObject:@(max) forKey:RunsNetworkMaxDownloadSpeedAttributeName];
-    }
-    if ([self hasCapability:RunsNetMeasurer_MinDownloadSpeed]) {
-        double min = [self calculateSpeedWithKeyPath:RunsNetFragmentation.minValueInputKeyPath];
-        [attributes setObject:@(min) forKey:RunsNetworkMinDownloadSpeedAttributeName];
-    }
-    if ([self hasCapability:RunsNetMeasurer_AverageDownloadSpeed]) {
-        double avg = [self calculateSpeedWithKeyPath:RunsNetFragmentation.avgValueInputKeyPath];
-        [attributes setObject:@(avg) forKey:RunsNetworkAverageDownloadSpeedAttributeName];
-    }
-    if ([self hasCapability:RunsNetMeasurer_RealTimeDownloadSpeed]) {
-        double cur = [self calculateRealTimeSpeedWithKeyPath:RunsNetFragmentation.realTimeInputKeyPath];
-        [attributes setObject:@(cur) forKey:RunsNetworkCurrentDownloadSpeedAttributeName];
-    }
-    if (self.measurerBlock) {
-        self.measurerBlock(attributes);
-    }
-}
-
-
-@end
-
