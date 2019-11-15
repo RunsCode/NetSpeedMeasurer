@@ -38,8 +38,11 @@
 @implementation RunsNetMeasurerResult
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"\nUplink: \n{\n   max : %.2f MB/s, min : %.2f MB/s, avg : %.2f MB/s, cur : %.2f MB/s \n}, \nDownlink: \n{\n   max : %.2f MB/s, min : %.2f MB/s, avg : %.2f MB/s, cur : %.2f MB/s \n}\n",
-            _uplinkMaxSpeed, _uplinkMinSpeed, _uplinkAvgSpeed, _uplinkCurSpeed, _downlinkMaxSpeed, _downlinkMinSpeed, _downlinkAvgSpeed, _downlinkCurSpeed];
+    return [NSString stringWithFormat:
+            @"\nUplink: \n{\n   max : %.2f MB/s, min : %.2f MB/s, avg : %.2f MB/s, cur : %.2f MB/s \n},
+            \nDownlink: \n{\n   max : %.2f MB/s, min : %.2f MB/s, avg : %.2f MB/s, cur : %.2f MB/s \n}\n",
+            _uplinkMaxSpeed, _uplinkMinSpeed, _uplinkAvgSpeed, _uplinkCurSpeed,
+            _downlinkMaxSpeed, _downlinkMinSpeed, _downlinkAvgSpeed, _downlinkCurSpeed];
 }
 @end
 
